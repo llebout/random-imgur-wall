@@ -437,7 +437,13 @@ impl Renderable<Model> for Model {
                 <h1>{ "NSFL Warning: images show up randomly and you may see terrible things staying on this site, watch with care." }</h1><br />
                 <h3>
                     { "Report abusive content " }
-                    <a target="_blank" rel="noopener" referrerpolicy="no-referrer" href={ "https://help.imgur.com/hc/en-us/articles/208582296-Reporting-Content"}>
+                    <a target="_blank" rel="noopener" referrerpolicy="no-referrer" href={ "https://help.imgur.com/hc/en-us/articles/208582296-Reporting-Content" }>
+                        { "here" }
+                    </a>
+                    { "." }
+                    { " " }
+                    { "Source code " }
+                    <a target="_blank" rel="noopener" referrerpolicy="no-referrer" href={ "https://github.com/leo-lb/random-imgur-wall" }>
                         { "here" }
                     </a>
                     { "." }
@@ -460,7 +466,7 @@ impl Renderable<Model> for Model {
                         }
                     }
                 </p>
-                <label for="rate">{ "Delay to wait before a new image shows up (in seconds, 0 for none" }</label><br />
+                <label for="rate">{ "Delay to wait before a new image shows up (in seconds, 0 for none)" }</label><br />
                 <input id="rate" type="number" value="2" oninput=|e| Msg::RateLimitChanged(e.value) /><br />
                 <p>
                     <b>{ "If images don't show fast enough, set an interval and click start, the lower the interval, the faster images will show up." }</b>
