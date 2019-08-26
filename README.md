@@ -16,7 +16,7 @@ cd ../server
 WS_LISTEN_ADDR="127.0.0.1:8002" cargo run --release &
 ```
 
-Now you can access it at http://localhost:8001
+Now you can access it at http://127.0.0.1:8001
 
 To stop it, run the following in the same unix shell as earlier:
 ```
