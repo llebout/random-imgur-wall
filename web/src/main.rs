@@ -60,6 +60,7 @@ struct Model {
     interval_service: IntervalService,
     interval_task: Option<IntervalTask>,
     reset_interval_task: Option<IntervalTask>,
+    rate_interval_task: Option<IntervalTask>,
     timeout_service: TimeoutService,
     timeout_task: Option<TimeoutTask>,
     is_started: bool,
@@ -74,6 +75,8 @@ struct Model {
     users_bruteforcing: u64,
     concurrent_loaded: usize,
     show_from_top: bool,
+    current_rate: u64,
+    rate_limit: u64,
 }
 
 enum Msg {
@@ -93,6 +96,8 @@ enum Msg {
     ResetRequestsPerSecond,
     LoadedChanged(String),
     ToggleShowMode,
+    RateLimitChanged(String),
+    ResetRateLimit,
     NoOp,
 }
 
@@ -121,6 +126,7 @@ impl Component for Model {
             interval_service,
             interval_task: None,
             reset_interval_task: None,
+            rate_interval_task: None,
             timeout_service,
             timeout_task: None,
             is_started: false,
@@ -135,6 +141,8 @@ impl Component for Model {
             users_bruteforcing: 0,
             concurrent_loaded: 100,
             show_from_top: false,
+            current_rate: 0,
+            rate_limit: 3,
         }
     }
 
@@ -168,6 +176,10 @@ impl Component for Model {
                 self.reset_interval_task = Some(self.interval_service.spawn(
                     Duration::from_secs(1),
                     self.link.send_back(|_| Msg::ResetRequestsPerSecond),
+                ));
+                self.rate_interval_task = Some(self.interval_service.spawn(
+                    Duration::from_secs(self.rate_limit),
+                    self.link.send_back(|_| Msg::ResetRateLimit),
                 ));
 
                 false
@@ -212,28 +224,32 @@ impl Component for Model {
                     if let Some(text) = msg.text {
                         if text.is_ascii() && text.chars().all(char::is_alphanumeric) {
 
-                            if self.concurrent_loaded != 0 {
-                                while self.images.len() > self.concurrent_loaded {
-                                    if self.show_from_top {
-                                        self.images.pop_front();
-                                    } else {
-                                        self.images.pop_back();
+                            if self.current_rate < self.rate_limit {
+                                if self.concurrent_loaded != 0 {
+                                    while self.images.len() > self.concurrent_loaded {
+                                        if self.show_from_top {
+                                            self.images.pop_front();
+                                        } else {
+                                            self.images.pop_back();
+                                        }
+                                    }
+
+                                    if self.images.len() >= self.concurrent_loaded {
+                                        if self.show_from_top {
+                                            self.images.pop_front();
+                                        } else {
+                                            self.images.pop_back();
+                                        }
                                     }
                                 }
 
-                                if self.images.len() >= self.concurrent_loaded {
-                                    if self.show_from_top {
-                                        self.images.pop_front();
-                                    } else {
-                                        self.images.pop_back();
-                                    }
+                                if self.show_from_top {
+                                    self.images.push_back(text);
+                                } else {
+                                    self.images.push_front(text);
                                 }
-                            }
 
-                            if self.show_from_top {
-                                self.images.push_back(text);
-                            } else {
-                                self.images.push_front(text);
+                                self.current_rate += 1;
                             }
 
                             self.images_found += 1;
@@ -351,6 +367,18 @@ impl Component for Model {
 
                 true
             }
+            Msg::RateLimitChanged(new_rate_limit) => {
+                if let Ok(rate_limit) = new_rate_limit.parse::<u64>() {
+                    self.rate_limit = rate_limit;
+
+                    self.rate_interval_task = Some(self.interval_service.spawn(
+                        Duration::from_secs(self.rate_limit),
+                        self.link.send_back(|_| Msg::ResetRateLimit),
+                    ));
+                }
+
+                false
+            }
             Msg::Start => {
                 if self.is_started == false {
                     self.interval_task = Some(
@@ -390,6 +418,11 @@ impl Component for Model {
 
                 true
             }
+            Msg::ResetRateLimit => {
+                self.current_rate = 0;
+
+                false
+            }
             _ => false,
         }
     }
@@ -400,6 +433,13 @@ impl Renderable<Model> for Model {
         html! {
             <body>
                 <h1>{ "NSFL Warning: images show up randomly and you may see terrible things staying on this site, watch with care." }</h1><br />
+                <h3>
+                    { "Report abusive content " }
+                    <a target="_blank" rel="noopener" href={ "https://help.imgur.com/hc/en-us/articles/208582296-Reporting-Content"}>
+                        { "here" }
+                    </a>
+                    { "." }
+                </h3>
                 <label for="interval">{ "Interval at which bruteforce requests are sent (ms)" }</label><br />
                 <input id="interval" type="number" value="100" oninput=|e| Msg::IntervalChanged(e.value) /><br />
                 <button onclick=|_| Msg::Start>{ "Start" }</button>
@@ -418,6 +458,8 @@ impl Renderable<Model> for Model {
                         }
                     }
                 </p>
+                <label for="rate">{ "How long to wait before a new image shows up (seconds)" }</label><br />
+                <input id="rate" type="number" value="3" oninput=|e| Msg::RateLimitChanged(e.value) /><br />
                 <p>
                     <b>{ "If images don't show fast enough, set an interval and click start, the lower the interval, the faster images will show up." }</b>
                 </p>
