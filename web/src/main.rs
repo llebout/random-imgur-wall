@@ -75,7 +75,7 @@ struct Model {
     users_bruteforcing: u64,
     concurrent_loaded: usize,
     show_from_top: bool,
-    current_rate: u64,
+    is_rate_limited: bool,
     rate_limit: u64,
 }
 
@@ -141,7 +141,7 @@ impl Component for Model {
             users_bruteforcing: 0,
             concurrent_loaded: 100,
             show_from_top: false,
-            current_rate: 0,
+            is_rate_limited: true,
             rate_limit: 3,
         }
     }
@@ -224,7 +224,7 @@ impl Component for Model {
                     if let Some(text) = msg.text {
                         if text.is_ascii() && text.chars().all(char::is_alphanumeric) {
 
-                            if self.current_rate < self.rate_limit {
+                            if self.is_rate_limited == false {
                                 if self.concurrent_loaded != 0 {
                                     while self.images.len() > self.concurrent_loaded {
                                         if self.show_from_top {
@@ -249,7 +249,7 @@ impl Component for Model {
                                     self.images.push_front(text);
                                 }
 
-                                self.current_rate += 1;
+                                self.is_rate_limited = true;
                             }
 
                             self.images_found += 1;
@@ -419,7 +419,7 @@ impl Component for Model {
                 true
             }
             Msg::ResetRateLimit => {
-                self.current_rate = 0;
+                self.is_rate_limited = false;
 
                 false
             }
