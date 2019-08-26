@@ -142,7 +142,7 @@ impl Component for Model {
             concurrent_loaded: 100,
             show_from_top: false,
             is_rate_limited: true,
-            rate_limit: 3,
+            rate_limit: 1,
         }
     }
 
@@ -459,7 +459,7 @@ impl Renderable<Model> for Model {
                     }
                 </p>
                 <label for="rate">{ "How long to wait before a new image shows up (seconds)" }</label><br />
-                <input id="rate" type="number" value="3" oninput=|e| Msg::RateLimitChanged(e.value) /><br />
+                <input id="rate" type="number" value="1" oninput=|e| Msg::RateLimitChanged(e.value) /><br />
                 <p>
                     <b>{ "If images don't show fast enough, set an interval and click start, the lower the interval, the faster images will show up." }</b>
                 </p>
