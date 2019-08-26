@@ -437,7 +437,7 @@ impl Renderable<Model> for Model {
                 <h1>{ "NSFL Warning: images show up randomly and you may see terrible things staying on this site, watch with care." }</h1><br />
                 <h3>
                     { "Report abusive content " }
-                    <a target="_blank" rel="noopener" href={ "https://help.imgur.com/hc/en-us/articles/208582296-Reporting-Content"}>
+                    <a target="_blank" rel="noopener" referrerpolicy="no-referrer" href={ "https://help.imgur.com/hc/en-us/articles/208582296-Reporting-Content"}>
                         { "here" }
                     </a>
                     { "." }
@@ -484,8 +484,8 @@ impl Renderable<Model> for Model {
                                 background-size: cover;
                                 background-position: center;
                                 width: 33%;">
-                                <a target="_blank" rel="noopener" href=format!("https://i.imgur.com/{}.png", image)>
-                                    <img style="width: 100%;"
+                                <a target="_blank" rel="noopener" referrerpolicy="no-referrer" href=format!("https://i.imgur.com/{}.png", image)>
+                                    <img decoding="async" referrerpolicy="no-referrer" style="width: 100%;"
                                         src=&format!("https://i.imgur.com/{}.png", image) />
                                 </a>
                             </div>
