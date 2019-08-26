@@ -224,7 +224,7 @@ impl Component for Model {
                     if let Some(text) = msg.text {
                         if text.is_ascii() && text.chars().all(char::is_alphanumeric) {
 
-                            if self.is_rate_limited == false {
+                            if self.is_rate_limited == false || self.rate_limit == 0 {
                                 if self.concurrent_loaded != 0 {
                                     while self.images.len() > self.concurrent_loaded {
                                         if self.show_from_top {
@@ -371,10 +371,12 @@ impl Component for Model {
                 if let Ok(rate_limit) = new_rate_limit.parse::<u64>() {
                     self.rate_limit = rate_limit;
 
-                    self.rate_interval_task = Some(self.interval_service.spawn(
-                        Duration::from_secs(self.rate_limit),
-                        self.link.send_back(|_| Msg::ResetRateLimit),
-                    ));
+                    if self.rate_limit != 0 {
+                        self.rate_interval_task = Some(self.interval_service.spawn(
+                            Duration::from_secs(self.rate_limit),
+                            self.link.send_back(|_| Msg::ResetRateLimit),
+                        ));
+                    }
                 }
 
                 false
@@ -458,7 +460,7 @@ impl Renderable<Model> for Model {
                         }
                     }
                 </p>
-                <label for="rate">{ "How long to wait before a new image shows up (seconds)" }</label><br />
+                <label for="rate">{ "Delay to wait before a new image shows up (in seconds, 0 for none" }</label><br />
                 <input id="rate" type="number" value="2" oninput=|e| Msg::RateLimitChanged(e.value) /><br />
                 <p>
                     <b>{ "If images don't show fast enough, set an interval and click start, the lower the interval, the faster images will show up." }</b>
