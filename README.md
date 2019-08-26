@@ -25,4 +25,4 @@ kill $(jobs -p)
 
 ---
 
-If you want to deploy this on a server with your own domain, remember to edit the config.json file to point to your websocket server. (https://github.com/leo-lb/random-imgur-wall/blob/master/web/static/config.json)
+If you want to deploy this on a server with your own domain, remember to edit the `config.json` file to point to your websocket server. (https://github.com/leo-lb/random-imgur-wall/blob/master/web/static/config.json)
