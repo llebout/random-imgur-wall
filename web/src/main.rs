@@ -525,8 +525,8 @@ impl Renderable<Model> for Model {
                                                                                         unreachable!();
                                                                                     }
                                                                                 } }> // <!-- modify this -->
-                                        <option>{ "Show from bottom" }</option>
                                         <option>{ "Show from top" }</option>
+                                        <option>{ "Show from bottom" }</option>
                                     </select></td>
                                 </tr>
                                 <tr>
