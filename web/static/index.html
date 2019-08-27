@@ -1,45 +1,109 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1" name="viewport" />
-    <script>
-        var Module = {};
-        var __cargo_web = {};
-        Object.defineProperty( Module, 'canvas', {
-            get: function() {
-                if( __cargo_web.canvas ) {
-                    return __cargo_web.canvas;
-                }
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1" name="viewport" />
+  <script>
+    var Module = {};
+    var __cargo_web = {};
+    Object.defineProperty(Module, 'canvas', {
+      get: function () {
+        if (__cargo_web.canvas) {
+          return __cargo_web.canvas;
+        }
 
-                var canvas = document.createElement( 'canvas' );
-                document.querySelector( 'body' ).appendChild( canvas );
-                __cargo_web.canvas = canvas;
+        var canvas = document.createElement('canvas');
+        document.querySelector('body').appendChild(canvas);
+        __cargo_web.canvas = canvas;
 
-                return canvas;
-            }
-        });
-    </script>
-    <script type="text/javascript">
-      if (typeof WebAssembly == "undefined") {
-        alert("This website requires WebAssembly and your web browser does not support it.")
-        location.href = "https://webassembly.org/"
+        return canvas;
       }
-    </script>
-    <style>
-      .img-div {
-        float: left;
-        cursor: default;
-        overflow: hidden;
-        background-repeat: no-repeat;
-        background-size: cover;
-        background-position: center;
-        width: 33%;
-      }
-    </style>
+    });
+  </script>
+  <script type="text/javascript">
+    if (typeof WebAssembly == "undefined") {
+      alert("This website requires WebAssembly and your web browser does not support it.")
+      location.href = "https://webassembly.org/"
+    }
+  </script>
+  <style>
+    :root {
+      --header-background: #5e4b56;
+      --header-text: #fcd0a1;
+      --body-background: #303030;
+      --section-background: #464655;
+      --section-heading: #fcd0a1;
+      --section-text: #ffffee;
+      --section-border: #3e4147;
+    }
+
+    #container {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--body-background);
+    }
+
+    header {
+      background-color: var(--header-background);
+      color: var(--header-text);
+      box-shadow: 2px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      padding: 0.5em;
+    }
+
+    header a {
+      color: var(--section-text);
+    }
+
+    main {
+      max-width: 1600px;
+      margin: auto;
+      padding: 0.5em;
+    }
+
+    section,
+    article {
+      display: block;
+      background-color: var(--section-background);
+      color: var(--section-text);
+      border: 1px solid var(--section-border);
+      border-radius: 6px;
+      box-shadow: 2px rgba(0, 0, 0, 0.5);
+      margin: 0.5em;
+      padding: 0.5em;
+    }
+
+    h2 {
+      color: var(--section-heading);
+    }
+
+    #container>section {
+      flex: 1;
+    }
+
+    #gallery {}
+
+    .imgur-image img {
+      display: inline;
+      margin: 0.3em;
+      border: 3px solid var(--section-border);
+    }
+
+    .images {
+      overflow: auto;
+      height: 2160px;
+    }
+  </style>
 </head>
+
 <body>
-    <script src="web.js"></script>
+  <script src="web.js"></script>
 </body>
+
 </html>

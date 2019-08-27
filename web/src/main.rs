@@ -1,4 +1,4 @@
-#![recursion_limit = "1024"]
+#![recursion_limit = "8192"]
 
 use failure::{format_err, Error};
 
@@ -14,7 +14,7 @@ use yew::services::interval::{IntervalService, IntervalTask};
 use yew::services::timeout::{TimeoutService, TimeoutTask};
 use yew::services::websocket::{WebSocketService, WebSocketStatus, WebSocketTask};
 
-use yew::{html, Component, ComponentLink, Html, Renderable, ShouldRender};
+use yew::{html, html::ChangeData, Component, ComponentLink, Html, Renderable, ShouldRender};
 
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
@@ -95,7 +95,7 @@ enum Msg {
     NotFound(String),
     ResetRequestsPerSecond,
     LoadedChanged(String),
-    ToggleShowMode,
+    ShowModeSelected(bool),
     RateLimitChanged(String),
     ResetRateLimit,
     NoOp,
@@ -223,7 +223,6 @@ impl Component for Model {
                 WsMessageType::New => {
                     if let Some(text) = msg.text {
                         if text.is_ascii() && text.chars().all(char::is_alphanumeric) {
-
                             if self.is_rate_limited == false || self.rate_limit == 0 {
                                 if self.concurrent_loaded != 0 {
                                     while self.images.len() > self.concurrent_loaded {
@@ -362,8 +361,8 @@ impl Component for Model {
 
                 false
             }
-            Msg::ToggleShowMode => {
-                self.show_from_top = !self.show_from_top;
+            Msg::ShowModeSelected(value) => {
+                self.show_from_top = value;
 
                 true
             }
@@ -433,7 +432,7 @@ impl Component for Model {
 impl Renderable<Model> for Model {
     fn view(&self) -> Html<Self> {
         html! {
-            <body>
+            /*<body>
                 <h1>{ "NSFL Warning: images show up randomly and you may see terrible things staying on this site, watch with care." }</h1><br />
                 <h3>
                     { "Report abusive content " }
@@ -491,6 +490,99 @@ impl Renderable<Model> for Model {
                         })
                     }
                 </p>
+            </body>*/
+            <body>
+                <header>
+                    <h1>{ "Random Imgur Wall" }</h1>
+                    <a target="_blank" rel="noopener" referrerpolicy="no-referrer" href="https://help.imgur.com/hc/en-us/articles/208582296-Reporting-Content">{ "Report abusive content" }</a>
+                </header>
+                <main>
+                    <div id="container">
+                        <section id="settings">
+                            <h2>{ "Settings" }</h2>
+                            <table>
+                                <tr>
+                                    <td><label for="interval">{ "Interval at which bruteforce requests are sent (in ms)" }</label></td>
+                                    <td><input id="interval" type="number" value=self.interval.as_millis() oninput=|e| Msg::IntervalChanged(e.value) /></td> // <!-- modify this -->
+                                </tr>
+                                <tr>
+                                    <td><label for="images">{ "Number of images to keep loaded at a time (0 for unlimited)" }</label></td>
+                                    <td><input id="images" type="number" value=self.concurrent_loaded oninput=|e| Msg::LoadedChanged(e.value) /></td> // <!-- modify this -->
+                                </tr>
+                                <tr>
+                                    <td><label for="mode">{ "Show mode" }</label></td>
+                                    <td><select id="mode" name="Show mode" onchange=|event| {
+                                                                                match event {
+                                                                                    ChangeData::Select(elem) => {
+                                                                                        let value = elem.selected_index().map(|x| x as usize);
+                                                                                        if let Some(idx) = value {
+                                                                                            Msg::ShowModeSelected(idx != 1)
+                                                                                        } else {
+                                                                                            unreachable!();
+                                                                                        }
+                                                                                    }
+                                                                                    _ => {
+                                                                                        unreachable!();
+                                                                                    }
+                                                                                } }> // <!-- modify this -->
+                                        <option>{ "Show from bottom" }</option>
+                                        <option>{ "Show from top" }</option>
+                                    </select></td>
+                                </tr>
+                                <tr>
+                                    <td><label for="delay">{ "Delay to wait before a new image shows up (in seconds, 0 for none)" }</label></td>
+                                    <td><input id="delay" type="number" value=self.rate_limit oninput=|e| Msg::RateLimitChanged(e.value) /></td> //<!-- modify this -->
+                                </tr>
+                            </table>
+                            <button type="button" onclick=|_| Msg::Start>{ "Start" }</button> //<!-- modify this -->
+                            <button type="button" onclick=|_| Msg::Stop>{ "Stop" }</button> //<!-- modify this -->
+                        </section>
+
+                        <section id="stats">
+                            <h2>{ "Statistics" }</h2>
+                            <table>
+                                <tr>
+                                    <td>{ "Total number of requests" }</td>
+                                    <td>{ format!("Total number of requests: {}", self.total_requests) }</td>
+                                </tr>
+                                <tr>
+                                    <td>{ "Requests completed per second" }</td>
+                                    <td>{ format!("Requests completed per second: {}", self.requests_per_second) }</td>
+                                </tr>
+                                <tr>
+                                    <td>{ "Images you found" }</td>
+                                    <td>{ format!("Images you found: {}", self.images_found_self) }</td>
+                                </tr>
+                                <tr>
+                                    <td>{ "Images everyone found" }</td>
+                                    <td>{ format!("Images everyone found: {}", self.images_found) }</td>
+                                </tr>
+                                <tr>
+                                    <td>{ "Users watching" }</td>
+                                    <td>{ format!("Users watching: {}", self.users_watching) }</td>
+                                </tr>
+                                <tr>
+                                    <td>{ "Users bruteforcing" }</td>
+                                    <td>{ format!("Users bruteforcing: {}", self.users_bruteforcing) }</td>
+                                </tr>
+                            </table>
+                        </section>
+                    </div>
+                    <section id="gallery">
+                        <h2>{ "Images" }</h2>
+                        <div class="images">
+                            {
+                                for self.images.iter().map(|image| html! {
+                                    <a class="imgur-image" target="_blank" rel="noopener" referrerpolicy="no-referrer" href=format!("https://i.imgur.com/{}.png", image)>
+                                        <img decoding="async" referrerpolicy="no-referrer" src=format!("https://i.imgur.com/{}.png", image) />
+                                    </a>
+                                })
+                            }
+                        </div>
+                    </section>
+                </main>
+                <footer>
+                </footer>
             </body>
         }
     }
