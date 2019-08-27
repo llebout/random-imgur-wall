@@ -482,14 +482,7 @@ impl Renderable<Model> for Model {
                 <p>
                     {
                         for self.images.iter().map(|image| html! {
-                            <div style=
-                                "float: left;
-                                cursor: default;
-                                overflow: hidden;
-                                background-repeat: no-repeat;
-                                background-size: cover;
-                                background-position: center;
-                                width: 33%;">
+                            <div class="img-div">
                                 <a target="_blank" rel="noopener" referrerpolicy="no-referrer" href=format!("https://i.imgur.com/{}.png", image)>
                                     <img decoding="async" referrerpolicy="no-referrer" style="width: 100%;"
                                         src=&format!("https://i.imgur.com/{}.png", image) />
