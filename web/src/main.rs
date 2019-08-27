@@ -543,27 +543,27 @@ impl Renderable<Model> for Model {
                             <table>
                                 <tr>
                                     <td>{ "Total number of requests" }</td>
-                                    <td>{ format!("Total number of requests: {}", self.total_requests) }</td>
+                                    <td>{ self.total_requests }</td>
                                 </tr>
                                 <tr>
                                     <td>{ "Requests completed per second" }</td>
-                                    <td>{ format!("Requests completed per second: {}", self.requests_per_second) }</td>
+                                    <td>{ self.requests_per_second }</td>
                                 </tr>
                                 <tr>
                                     <td>{ "Images you found" }</td>
-                                    <td>{ format!("Images you found: {}", self.images_found_self) }</td>
+                                    <td>{ self.images_found_self }</td>
                                 </tr>
                                 <tr>
                                     <td>{ "Images everyone found" }</td>
-                                    <td>{ format!("Images everyone found: {}", self.images_found) }</td>
+                                    <td>{ self.images_found }</td>
                                 </tr>
                                 <tr>
                                     <td>{ "Users watching" }</td>
-                                    <td>{ format!("Users watching: {}", self.users_watching) }</td>
+                                    <td>{ self.users_watching }</td>
                                 </tr>
                                 <tr>
                                     <td>{ "Users bruteforcing" }</td>
-                                    <td>{ format!("Users bruteforcing: {}", self.users_bruteforcing) }</td>
+                                    <td>{ self.users_bruteforcing }</td>
                                 </tr>
                             </table>
                         </section>
