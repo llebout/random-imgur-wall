@@ -29,19 +29,23 @@
     }
   </script>
   <style>
+    /* --- GENERAL STUFF --- */
+    /* colors */
     :root {
-      --header-background: #5e4b56;
-      --header-text: #fcd0a1;
-      --body-background: #303030;
-      --section-background: #464655;
-      --section-heading: #fcd0a1;
-      --section-text: #ffffee;
-      --section-border: #3e4147;
+      --header-background: #ff4949;
+      --header-text: #1e1b18;
+      --body-background: #e2e2e2;
+      --section-background: #fffaff;
+      --section-heading: #1e1b18;
+      --section-text: #333333;
+      --link-color: #00938c;
     }
 
-    #container {
-      display: flex;
-      flex-wrap: wrap;
+    section,
+    article,
+    header,
+    h1 {
+      box-shadow: 3px 3px 3px rgba(50, 50, 50, 0.2);
     }
 
     body {
@@ -49,20 +53,41 @@
       background-color: var(--body-background);
     }
 
+    h2 {
+      color: var(--section-heading);
+    }
+
+    table {
+      width: 100%;
+    }
+
+    a {
+      text-decoration: none;
+      color: var(--link-color);
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* --- HEADER --- */
     header {
       background-color: var(--header-background);
       color: var(--header-text);
-      box-shadow: 2px rgba(0, 0, 0, 0.5);
       text-align: center;
-      padding: 0.5em;
+      padding: 1em 0;
     }
 
-    header a {
-      color: var(--section-text);
+    header h1 {
+      padding: 1em;
+      background-color: var(--section-background);
+      display: inline-block;
+      margin: 0;
     }
 
+
+    /* --- ACTUAL CONTENT --- */
     main {
-      max-width: 1600px;
       margin: auto;
       padding: 0.5em;
     }
@@ -72,32 +97,51 @@
       display: block;
       background-color: var(--section-background);
       color: var(--section-text);
-      border: 1px solid var(--section-border);
-      border-radius: 6px;
-      box-shadow: 2px rgba(0, 0, 0, 0.5);
       margin: 0.5em;
       padding: 0.5em;
     }
 
-    h2 {
-      color: var(--section-heading);
+    #container {
+      display: flex;
+      flex-wrap: wrap;
     }
 
     #container>section {
       flex: 1;
     }
 
-    #gallery {}
-
-    .imgur-image img {
-      display: inline;
-      margin: 0.3em;
-      border: 3px solid var(--section-border);
+    /* --- IMAGE GALLERY --- */
+    #gallery {
+      display: flex;
+      flex-wrap: wrap;
+      overflow: auto;
+      height: 100%;
     }
 
-    .images {
-      overflow: auto;
-      height: 2160px;
+    .imgur-image-container {
+      display: inline-block;
+      margin: 0.2em;
+      flex-grow: 1;
+      width: calc(100% * (1/4) - 2*0.2em - 5px);
+      background-color: var(--body-background);
+      border: 1px solid var(--section-border);
+    }
+
+    .imgur-image {
+      height: auto;
+      width: 100%;
+    }
+
+    /* --- RESIZE STUFF --- */
+    @media (orientation: portrait),
+    (max-width: 1200px) {
+      #container {
+        flex-direction: column;
+      }
+
+      .imgur-image-container {
+        width: calc(100% * (1/2) - 2*0.2em - 5px);
+      }
     }
   </style>
 </head>

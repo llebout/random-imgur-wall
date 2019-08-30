@@ -432,72 +432,33 @@ impl Component for Model {
 impl Renderable<Model> for Model {
     fn view(&self) -> Html<Self> {
         html! {
-            /*<body>
-                <h1>{ "NSFL Warning: images show up randomly and you may see terrible things staying on this site, watch with care." }</h1><br />
-                <h3>
-                    { "Report abusive content " }
-                    <a target="_blank" rel="noopener" referrerpolicy="no-referrer" href={ "https://help.imgur.com/hc/en-us/articles/208582296-Reporting-Content" }>
-                        { "here" }
-                    </a>
-                    { "." }
-                    { " " }
-                    { "Source code " }
-                    <a target="_blank" rel="noopener" referrerpolicy="no-referrer" href={ "https://github.com/leo-lb/random-imgur-wall" }>
-                        { "here" }
-                    </a>
-                    { "." }
-                </h3>
-                <label for="interval">{ "Interval at which bruteforce requests are sent (ms)" }</label><br />
-                <input id="interval" type="number" value="100" oninput=|e| Msg::IntervalChanged(e.value) /><br />
-                <button onclick=|_| Msg::Start>{ "Start" }</button>
-                <button onclick=|_| Msg::Stop>{ "Stop" }</button><br />
-                <p>
-                    <label for="loaded">{ "Number of images to keep loaded at a time (0 for unlimited, but it can crash your browser)" }</label><br />
-                    <input id="loaded" type="number" value="100" oninput=|e| Msg::LoadedChanged(e.value) /><br />
-                </p>
-                <button onclick=|_| Msg::ToggleShowMode>{ "Toggle Show Mode" }</button>
-                <p>
-                    {
-                        if self.show_from_top == true {
-                           "Current show mode: from top"
-                        } else {
-                           "Current show mode: from bottom"
-                        }
-                    }
-                </p>
-                <label for="rate">{ "Delay to wait before a new image shows up (in seconds, 0 for none)" }</label><br />
-                <input id="rate" type="number" value="2" oninput=|e| Msg::RateLimitChanged(e.value) /><br />
-                <p>
-                    <b>{ "If images don't show fast enough, set an interval and click start, the lower the interval, the faster images will show up." }</b>
-                </p>
-                <p>
-                    { format!("Total number of requests: {}", self.total_requests) }<br />
-                    { format!("Requests completed per second: {}", self.requests_per_second) }<br />
-                    { format!("Images you found: {}", self.images_found_self) }<br />
-                    { format!("Images everyone found: {}", self.images_found) }<br />
-                    { format!("Users watching: {}", self.users_watching) }<br />
-                    { format!("Users bruteforcing: {}", self.users_bruteforcing) }<br />
-                </p>
-                <p>
-                    {
-                        for self.images.iter().map(|image| html! {
-                            <div class="img-div">
-                                <a target="_blank" rel="noopener" referrerpolicy="no-referrer" href=format!("https://i.imgur.com/{}.png", image)>
-                                    <img decoding="async" referrerpolicy="no-referrer" style="width: 100%;"
-                                        src=&format!("https://i.imgur.com/{}.png", image) />
-                                </a>
-                            </div>
-                        })
-                    }
-                </p>
-            </body>*/
             <body>
                 <header>
                     <h1>{ "Random Imgur Wall" }</h1>
-                    <a target="_blank" rel="noopener" referrerpolicy="no-referrer" href="https://help.imgur.com/hc/en-us/articles/208582296-Reporting-Content">{ "Report abusive content" }</a>
                 </header>
                 <main>
                     <div id="container">
+                        <section id="info">
+                            <h2>{ "NSFL Warning" }</h2>
+                            <p>{ "Images show up randomly and you may see terrible things staying on this site, watch with care." }</p>
+                            <p>
+                                <a target="_blank" rel="noopener" referrerpolicy="no-referrer" href="https://help.imgur.com/hc/en-us/articles/208582296-Reporting-Content">
+                                    { "Report abusive content" }
+                                </a>
+                            </p>
+                            <p>
+                                <a target="_blank" rel="noopener" referrerpolicy="no-referrer" href={ "https://github.com/leo-lb/random-imgur-wall" }>
+                                    { "Source code" }
+                                </a>
+                            </p>
+                            <p>
+                                { "Thanks to " }
+                                <a target="_blank" rel="noopener" referrerpolicy="no-referrer" href={ "https://www.reddit.com/user/quickscoperdoge" }>
+                                    { "u/quickscoperdoge" }
+                                </a>
+                                { " for the revamped design!" }
+                            </p>
+                        </section>
                         <section id="settings">
                             <h2>{ "Settings" }</h2>
                             <table>
@@ -534,8 +495,10 @@ impl Renderable<Model> for Model {
                                     <td><input id="delay" type="number" value=self.rate_limit oninput=|e| Msg::RateLimitChanged(e.value) /></td> //<!-- modify this -->
                                 </tr>
                             </table>
-                            <button type="button" onclick=|_| Msg::Start>{ "Start" }</button> //<!-- modify this -->
-                            <button type="button" onclick=|_| Msg::Stop>{ "Stop" }</button> //<!-- modify this -->
+                            <p style="overflow: auto;">
+                                <button type="button" style="margin: auto; width: 50%;" onclick=|_| Msg::Start>{ "Start" }</button> //<!-- modify this -->
+                                <button type="button" style="margin: auto; width: 50%;" onclick=|_| Msg::Stop>{ "Stop" }</button> //<!-- modify this -->
+                            </p>
                         </section>
 
                         <section id="stats">
@@ -568,13 +531,13 @@ impl Renderable<Model> for Model {
                             </table>
                         </section>
                     </div>
-                    <section id="gallery">
+                    <section id="images">
                         <h2>{ "Images" }</h2>
-                        <div class="images">
+                        <div id="gallery">
                             {
                                 for self.images.iter().map(|image| html! {
-                                    <a class="imgur-image" target="_blank" rel="noopener" referrerpolicy="no-referrer" href=format!("https://i.imgur.com/{}.png", image)>
-                                        <img decoding="async" referrerpolicy="no-referrer" src=format!("https://i.imgur.com/{}.png", image) />
+                                    <a class="imgur-image-container" target="_blank" rel="noopener" referrerpolicy="no-referrer" href=format!("https://i.imgur.com/{}.png", image)>
+                                        <img class="imgur-image" decoding="async" referrerpolicy="no-referrer" src=format!("https://i.imgur.com/{}.png", image) />
                                     </a>
                                 })
                             }
