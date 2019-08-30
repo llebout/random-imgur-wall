@@ -140,7 +140,7 @@ impl Component for Model {
             users_watching: 0,
             users_bruteforcing: 0,
             concurrent_loaded: 100,
-            show_from_top: false,
+            show_from_top: true,
             is_rate_limited: true,
             rate_limit: 2,
         }
@@ -532,7 +532,7 @@ impl Renderable<Model> for Model {
                         </section>
                     </div>
                     <section id="images">
-                        <h2>{ "Images" }</h2>
+                        <h2 style="text-align: center;">{ "Images" }</h2>
                         <div id="gallery">
                             {
                                 for self.images.iter().map(|image| html! {
