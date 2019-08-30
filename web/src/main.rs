@@ -140,7 +140,7 @@ impl Component for Model {
             users_watching: 0,
             users_bruteforcing: 0,
             concurrent_loaded: 100,
-            show_from_top: true,
+            show_from_top: false,
             is_rate_limited: true,
             rate_limit: 2,
         }
@@ -486,8 +486,8 @@ impl Renderable<Model> for Model {
                                                                                         unreachable!();
                                                                                     }
                                                                                 } }> // <!-- modify this -->
-                                        <option>{ "Show from top" }</option>
                                         <option>{ "Show from bottom" }</option>
+                                        <option>{ "Show from top" }</option>
                                     </select></td>
                                 </tr>
                                 <tr>
