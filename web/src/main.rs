@@ -463,7 +463,7 @@ impl Renderable<Model> for Model {
                             <h2>{ "Settings" }</h2>
                             <table>
                                 <tr>
-                                    <td><label for="interval">{ "Interval at which bruteforce requests are sent (in ms)" }</label><b>{" Want to see images faster? Decrease this."}</b></td>
+                                    <td><label for="interval">{ "Interval at which bruteforce requests are sent (in ms)" }</label><b>{" Want to see images faster? Decrease this and press Start."}</b></td>
                                     <td><input id="interval" type="number" value=self.interval.as_millis() oninput=|e| Msg::IntervalChanged(e.value) /></td> // <!-- modify this -->
                                 </tr>
                                 <tr>
