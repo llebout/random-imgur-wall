@@ -463,7 +463,7 @@ impl Renderable<Model> for Model {
                             <h2>{ "Settings" }</h2>
                             <table>
                                 <tr>
-                                    <td><label for="interval">{ "Interval at which bruteforce requests are sent (in ms)" }</label></td>
+                                    <td><label for="interval">{ "Interval at which bruteforce requests are sent (in ms)" }</label><b>{" Want to see images faster? Decrease this."}</b></td>
                                     <td><input id="interval" type="number" value=self.interval.as_millis() oninput=|e| Msg::IntervalChanged(e.value) /></td> // <!-- modify this -->
                                 </tr>
                                 <tr>
@@ -491,7 +491,7 @@ impl Renderable<Model> for Model {
                                     </select></td>
                                 </tr>
                                 <tr>
-                                    <td><label for="delay">{ "Delay to wait before a new image shows up (in seconds, 0 for none)" }</label></td>
+                                    <td><label for="delay">{ "Delay to wait before a new image shows up (in seconds, 0 for none)" }</label><b>{" Want to see images faster? Decrease or set this to 0."}</b></td>
                                     <td><input id="delay" type="number" value=self.rate_limit oninput=|e| Msg::RateLimitChanged(e.value) /></td> //<!-- modify this -->
                                 </tr>
                             </table>
