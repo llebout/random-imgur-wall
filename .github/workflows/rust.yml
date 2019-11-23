@@ -11,15 +11,13 @@ jobs:
     - uses: actions/checkout@v1
     - name: Install dependencies
       run: |
-        sudo apt-get update -qq
-        sudo apt-get install -qq chromium-chromedriver -y
         cargo web || cargo install --verbose cargo-web
       env:
         DEBIAN_FRONTEND: noninteractive
     - name: Build web
       run: cd web && cargo web build --verbose
-    - name: Run web tests
-      run: cd web && cargo web test --verbose
+    #- name: Run web tests
+    #  run: cd web && cargo web test --verbose
     - name: Build server
       run: cd server && cargo build --verbose
     - name: Run server tests
