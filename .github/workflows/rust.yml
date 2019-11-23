@@ -10,7 +10,10 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Install dependencies
-      run: cargo install --verbose --force cargo-web
+      run: cargo install --verbose --force cargo-web && \
+            export DEBIAN_FRONTEND=noninteractive && \
+            sudo apt-get update -qq && \
+            sudo apt-get install -qq chromium-chromedriver -y
     - name: Build web
       run: cd web && cargo web build --verbose
     - name: Run web tests
