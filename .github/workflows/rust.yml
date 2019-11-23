@@ -1,0 +1,21 @@
+name: Rust
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install dependencies
+      run: cargo install --verbose --force cargo-web
+    - name: Build web
+      run: cd web && cargo web build --verbose
+    - name: Run web tests
+      run: cd web && cargo web test --verbose
+    - name: Build server
+      run: cd server && cargo build --verbose
+    - name: Run server tests
+      run: cd server && cargo test --verbose
