@@ -1,0 +1,54 @@
+name: Rust
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install dependencies
+      run: |
+        cargo web || cargo install --verbose cargo-web
+      env:
+        DEBIAN_FRONTEND: noninteractive
+    - name: Build web
+      run: cd web && cargo web build --verbose
+    #- name: Run web tests
+    #  run: cd web && cargo web test --verbose
+    - name: Build server
+      run: cd server && cargo build --verbose
+    - name: Run server tests
+      run: cd server && cargo test --verbose
+      
+    - name: Cache cargo registry
+      uses: actions/cache@v1
+      with:
+        path: ~/.cargo/registry
+        key: primary
+    
+    - name: Cache cargo index
+      uses: actions/cache@v1
+      with:
+        path: ~/.cargo/git
+        key: primary
+    
+    - name: Cache cargo binaries
+      uses: actions/cache@v1
+      with:
+        path: ~/.cargo/bin
+        key: primary
+    
+    - name: Cache web cargo build
+      uses: actions/cache@v1
+      with:
+        path: web/target
+        key: primary
+    
+    - name: Cache server cargo build
+      uses: actions/cache@v1
+      with:
+        path: server/target
+        key: primary
