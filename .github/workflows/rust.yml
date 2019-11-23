@@ -10,9 +10,9 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Install dependencies
-      run: sudo apt-get update -qq && \
-          sudo apt-get install -qq chromium-chromedriver -y && \
-          cargo install --verbose --force cargo-web
+      run: apt-get update -qq && \
+           apt-get install -qq chromium-chromedriver -y && \
+           cargo web || cargo install --verbose cargo-web
       env:
         DEBIAN_FRONTEND: noninteractive
     - name: Build web
@@ -23,3 +23,33 @@ jobs:
       run: cd server && cargo build --verbose
     - name: Run server tests
       run: cd server && cargo test --verbose
+      
+    - name: Cache cargo registry
+      uses: actions/cache@v1
+      with:
+        path: ~/.cargo/registry
+        key: primary
+    
+    - name: Cache cargo index
+      uses: actions/cache@v1
+      with:
+        path: ~/.cargo/git
+        key: primary
+    
+    - name: Cache cargo binaries
+      uses: actions/cache@v1
+      with:
+        path: ~/.cargo/bin
+        key: primary
+    
+    - name: Cache web cargo build
+      uses: actions/cache@v1
+      with:
+        path: web/target
+        key: primary
+    
+    - name: Cache server cargo build
+      uses: actions/cache@v1
+      with:
+        path: server/target
+        key: primary
