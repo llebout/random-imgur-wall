@@ -1,6 +1,6 @@
 #![recursion_limit = "8192"]
 
-use failure::{format_err, Error};
+use anyhow::{anyhow, Error};
 
 use serde::{Deserialize, Serialize};
 
@@ -112,7 +112,7 @@ impl Component for Model {
         let console_service = ConsoleService::new();
         let timeout_service = TimeoutService::new();
 
-        link.send_self(Msg::FetchConfig);
+        link.send_message(Msg::FetchConfig);
 
         Model {
             link,
@@ -152,13 +152,13 @@ impl Component for Model {
                 self.fetch_task =
                     Some(self.fetch_service.fetch(
                         Request::get("/config.json").body(Nothing).unwrap(),
-                        self.link.send_back(
+                        self.link.callback(
                             move |response: Response<Json<Result<Config, Error>>>| {
                                 let (meta, Json(config)) = response.into_parts();
                                 if meta.status.is_success() {
                                     Msg::FetchConfigDone(config)
                                 } else {
-                                    Msg::FetchConfigDone(Err(format_err!(
+                                    Msg::FetchConfigDone(Err(anyhow!(
                                         "{}: could not fetch /config.json",
                                         meta.status
                                     )))
@@ -172,14 +172,14 @@ impl Component for Model {
             Msg::FetchConfigDone(Ok(config)) => {
                 self.config = Some(config);
 
-                self.link.send_self(Msg::WsConnect);
+                self.link.send_message(Msg::WsConnect);
                 self.reset_interval_task = Some(self.interval_service.spawn(
                     Duration::from_secs(1),
-                    self.link.send_back(|_| Msg::ResetRequestsPerSecond),
+                    self.link.callback(|_| Msg::ResetRequestsPerSecond),
                 ));
                 self.rate_interval_task = Some(self.interval_service.spawn(
                     Duration::from_secs(self.rate_limit),
-                    self.link.send_back(|_| Msg::ResetRateLimit),
+                    self.link.callback(|_| Msg::ResetRateLimit),
                 ));
 
                 false
@@ -187,21 +187,22 @@ impl Component for Model {
             Msg::WsConnect => {
                 if let Some(config) = &self.config {
                     if self.ws_task.is_none() {
-                        let callback = self.link.send_back(|Json(data)| Msg::WsMessage(data));
-                        let notification = self.link.send_back(|status| match status {
+                        let callback = self.link.callback(|Json(data)| Msg::WsMessage(data));
+                        let notification = self.link.callback(|status| match status {
                             WebSocketStatus::Opened => Msg::WsConnected,
                             WebSocketStatus::Closed | WebSocketStatus::Error => Msg::WsLost.into(),
                         });
                         let task = self
                             .ws_service
-                            .connect(&config.ws_url, callback, notification);
+                            .connect(&config.ws_url, callback, notification)
+                            .unwrap();
                         self.ws_task = Some(task);
                     }
                 }
                 false
             }
             Msg::WsConnected => {
-                self.link.send_self(Msg::Start);
+                self.link.send_message(Msg::Start);
                 false
             }
             Msg::WsLost => {
@@ -209,7 +210,7 @@ impl Component for Model {
 
                 self.timeout_task = Some(self.timeout_service.spawn(
                     Duration::from_secs(1),
-                    self.link.send_back(|_| Msg::WsConnect),
+                    self.link.callback(|_| Msg::WsConnect),
                 ));
 
                 false
@@ -300,7 +301,7 @@ impl Component for Model {
                             referrer_policy: Some(ReferrerPolicy::NoReferrer),
                             integrity: None,
                         },
-                        self.link.send_back(move |response: Response<Nothing>| {
+                        self.link.callback(move |response: Response<Nothing>| {
                             let (meta, _) = response.into_parts();
 
                             let message = format!("{:#?}", meta);
@@ -320,7 +321,7 @@ impl Component for Model {
                 // self.console_service.log(&message);
 
                 self.find_fetch_tasks.remove(&data);
-                self.link.send_self(Msg::WsSend(WsMessage {
+                self.link.send_message(Msg::WsSend(WsMessage {
                     msg_type: WsMessageType::New,
                     text: Some(data),
                     number: None,
@@ -348,7 +349,7 @@ impl Component for Model {
                 if self.is_started {
                     self.interval_task = Some(
                         self.interval_service
-                            .spawn(self.interval, self.link.send_back(|_| Msg::TryFind)),
+                            .spawn(self.interval, self.link.callback(|_| Msg::TryFind)),
                     );
                 }
 
@@ -373,7 +374,7 @@ impl Component for Model {
                     if self.rate_limit != 0 {
                         self.rate_interval_task = Some(self.interval_service.spawn(
                             Duration::from_secs(self.rate_limit),
-                            self.link.send_back(|_| Msg::ResetRateLimit),
+                            self.link.callback(|_| Msg::ResetRateLimit),
                         ));
                     }
                 }
@@ -384,10 +385,10 @@ impl Component for Model {
                 if self.is_started == false {
                     self.interval_task = Some(
                         self.interval_service
-                            .spawn(self.interval, self.link.send_back(|_| Msg::TryFind)),
+                            .spawn(self.interval, self.link.callback(|_| Msg::TryFind)),
                     );
 
-                    self.link.send_self(Msg::WsSend(WsMessage {
+                    self.link.send_message(Msg::WsSend(WsMessage {
                         msg_type: WsMessageType::Start,
                         text: None,
                         number: None,
@@ -402,7 +403,7 @@ impl Component for Model {
                 self.interval_task = None;
 
                 if self.is_started == true {
-                    self.link.send_self(Msg::WsSend(WsMessage {
+                    self.link.send_message(Msg::WsSend(WsMessage {
                         msg_type: WsMessageType::Stop,
                         text: None,
                         number: None,
@@ -427,10 +428,8 @@ impl Component for Model {
             _ => false,
         }
     }
-}
 
-impl Renderable<Model> for Model {
-    fn view(&self) -> Html<Self> {
+    fn view(&self) -> Html {
         html! {
             <body>
                 <header>

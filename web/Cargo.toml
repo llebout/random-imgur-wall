@@ -13,3 +13,4 @@ serde_derive = "1.0.104"
 failure = "0.1.6"
 rand = { version = "0.7.3", features = [ "stdweb" ] }
 http = "0.2.0"
+anyhow = "1.0.26"
