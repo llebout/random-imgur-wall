@@ -8,8 +8,8 @@ edition = "2018"
 
 [dependencies]
 yew = { git = "https://github.com/leo-lb/yew.git", branch = "more_fetch_options" }
-serde = "1.0.99"
-serde_derive = "1.0.99"
-failure = "0.1.5"
-rand = { version = "0.7.0", features = [ "stdweb" ] }
-http = "0.1.18"
+serde = "1.0.104"
+serde_derive = "1.0.104"
+failure = "0.1.6"
+rand = { version = "0.7.3", features = [ "stdweb" ] }
+http = "0.2.0"
