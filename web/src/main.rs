@@ -463,19 +463,18 @@ impl Component for Model {
                             <table>
                                 <tr>
                                     <td><label for="interval">{ "Interval at which bruteforce requests are sent (in ms)" }</label><b>{" Want to see images faster? Decrease this and press Start."}</b></td>
-                                    <td><input id="interval" type="number" value=self.interval.as_millis() oninput=|e| Msg::IntervalChanged(e.value) /></td> // <!-- modify this -->
+                                    <td><input id="interval" type="number" value=self.interval.as_millis() oninput=self.link.callback(|e: yew::events::InputData| Msg::IntervalChanged(e.value)) /></td> // <!-- modify this -->
                                 </tr>
                                 <tr>
                                     <td><label for="images">{ "Number of images to keep loaded at a time (0 for unlimited)" }</label></td>
-                                    <td><input id="images" type="number" value=self.concurrent_loaded oninput=|e| Msg::LoadedChanged(e.value) /></td> // <!-- modify this -->
+                                    <td><input id="images" type="number" value=self.concurrent_loaded oninput=self.link.callback(|e: yew::events::InputData| Msg::LoadedChanged(e.value)) /></td> // <!-- modify this -->
                                 </tr>
                                 <tr>
                                     <td><label for="mode">{ "Show mode" }</label></td>
-                                    <td><select id="mode" name="Show mode" onchange=|event| {
+                                    <td><select id="mode" name="Show mode" onchange=self.link.callback(|event: yew::events::ChangeData|
                                                                                 match event {
                                                                                     ChangeData::Select(elem) => {
-                                                                                        let value = elem.selected_index().map(|x| x as usize);
-                                                                                        if let Some(idx) = value {
+                                                                                        if let Some(idx) = elem.selected_index() {
                                                                                             Msg::ShowModeSelected(idx != 1)
                                                                                         } else {
                                                                                             unreachable!();
@@ -484,19 +483,19 @@ impl Component for Model {
                                                                                     _ => {
                                                                                         unreachable!();
                                                                                     }
-                                                                                } }> // <!-- modify this -->
+                                                                                })> // <!-- modify this -->
                                         <option>{ "Show from bottom" }</option>
                                         <option>{ "Show from top" }</option>
                                     </select></td>
                                 </tr>
                                 <tr>
                                     <td><label for="delay">{ "Delay to wait before a new image shows up (in seconds, 0 for none)" }</label><b>{" Want to see images faster? Decrease or set this to 0."}</b></td>
-                                    <td><input id="delay" type="number" value=self.rate_limit oninput=|e| Msg::RateLimitChanged(e.value) /></td> //<!-- modify this -->
+                                    <td><input id="delay" type="number" value=self.rate_limit oninput=self.link.callback(|e: yew::events::InputData| Msg::RateLimitChanged(e.value)) /></td> //<!-- modify this -->
                                 </tr>
                             </table>
                             <p style="overflow: auto;">
-                                <button type="button" style="margin: auto; width: 50%;" onclick=|_| Msg::Start>{ "Start" }</button> //<!-- modify this -->
-                                <button type="button" style="margin: auto; width: 50%;" onclick=|_| Msg::Stop>{ "Stop" }</button> //<!-- modify this -->
+                                <button type="button" style="margin: auto; width: 50%;" onclick=self.link.callback(|_| Msg::Start)>{ "Start" }</button> //<!-- modify this -->
+                                <button type="button" style="margin: auto; width: 50%;" onclick=self.link.callback(|_| Msg::Stop)>{ "Stop" }</button> //<!-- modify this -->
                             </p>
                         </section>
 
